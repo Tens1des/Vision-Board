@@ -80,6 +80,20 @@ extension Date {
         formatter.dateStyle = .short
         return formatter.string(from: self)
     }
+    
+    func daysAgo() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        let days = calendar.dateComponents([.day], from: self, to: now).day ?? 0
+        
+        if days == 0 {
+            return LocalizedStrings.today
+        } else if days == 1 {
+            return LocalizedStrings.yesterday
+        } else {
+            return "\(days) \(LocalizedStrings.daysAgo)"
+        }
+    }
 }
 
 // MARK: - Array Extensions

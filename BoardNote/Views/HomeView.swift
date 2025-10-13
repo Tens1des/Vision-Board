@@ -12,6 +12,7 @@ struct HomeView: View {
     @ObservedObject var dataManager = DataManager.shared
     @State private var searchText = ""
     @State private var showingNewBoardSheet = false
+    @State private var selectedBoard: Board?
     
     var filteredBoards: [Board] {
         if searchText.isEmpty {
@@ -47,23 +48,68 @@ struct HomeView: View {
             .sheet(isPresented: $showingNewBoardSheet) {
                 NewBoardSheet(isPresented: $showingNewBoardSheet)
             }
+            .fullScreenCover(item: $selectedBoard) { board in
+                BoardDetailView(board: board)
+            }
         }
     }
     
     // MARK: - Header View
     private var headerView: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("My Boards")
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.black)
-            Text("Create and organize your vision")
-                .font(.system(size: 14))
-                .foregroundColor(.gray)
+        VStack(spacing: 20) {
+            // User Profile Section
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(LocalizedStrings.hello)
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                    Text(dataManager.user.name)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.black)
+                }
+                
+                Spacer()
+                
+                // User Avatar
+                Button(action: {
+                    // Profile action - could open profile sheet
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(hex: dataManager.user.avatarColor),
+                                        Color(hex: dataManager.user.avatarColor).opacity(0.7)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 50, height: 50)
+                        
+                        Image(systemName: dataManager.user.avatarIcon)
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
+            
+            // Title and Subtitle
+            VStack(alignment: .leading, spacing: 4) {
+                Text(LocalizedStrings.myBoards)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.black)
+                Text(LocalizedStrings.createAndOrganize)
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
-        .padding(.top, 60)
-        .padding(.bottom, 20)
     }
     
     // MARK: - Search Bar
@@ -87,17 +133,15 @@ struct HomeView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(filteredBoards) { board in
-                    NavigationLink(destination: BoardDetailView(board: board)) {
-                        BoardCard(board: board)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .contextMenu {
-                        Button(role: .destructive) {
+                    BoardCard(
+                        board: board,
+                        onTap: {
+                            selectedBoard = board
+                        },
+                        onDelete: {
                             deleteBoard(board)
-                        } label: {
-                            Label(LocalizedStrings.deleteBoard, systemImage: "trash")
                         }
-                    }
+                    )
                 }
                 .onDelete(perform: deleteBoardsAtOffsets)
             }
@@ -197,84 +241,108 @@ struct HomeView: View {
 // MARK: - Board Card
 struct BoardCard: View {
     let board: Board
+    let onTap: () -> Void
+    let onDelete: () -> Void
     @ObservedObject var dataManager = DataManager.shared
+    @State private var showingDeleteAlert = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Thumbnail
+        HStack(spacing: 16) {
+            // Thumbnail (left side)
             ZStack {
-                // Background gradient
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.appPrimary.opacity(0.6), Color.appSecondary.opacity(0.6)]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(height: 150)
-                
                 // Show thumbnail if available
                 if let thumbnailData = board.thumbnailData,
                    let uiImage = UIImage(data: thumbnailData) {
                     Image(uiImage: uiImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(height: 150)
-                        .clipped()
+                        .frame(width: 80, height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
-                    // Fallback: Show custom icon
-                    if let iconPhotoData = board.iconPhotoData, let uiImage = UIImage(data: iconPhotoData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 3)
+                    // Fallback: Show custom icon or default
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.appPrimary.opacity(0.6), Color.appSecondary.opacity(0.6)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
-                    } else if let emoji = board.iconEmoji, !emoji.isEmpty {
-                        Text(emoji)
-                            .font(.system(size: 60))
-                    } else {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.system(size: 50))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
+                        )
+                        .frame(width: 80, height: 80)
+                        .overlay(
+                            Group {
+                                if let iconPhotoData = board.iconPhotoData, let uiImage = UIImage(data: iconPhotoData) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 50, height: 50)
+                                        .clipShape(Circle())
+                                } else if let emoji = board.iconEmoji, !emoji.isEmpty {
+                                    Text(emoji)
+                                        .font(.system(size: 40))
+                                } else {
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .font(.system(size: 30))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                            }
+                        )
                 }
             }
             
-            // Info
-            VStack(alignment: .leading, spacing: 8) {
+            // Content (center)
+            VStack(alignment: .leading, spacing: 4) {
+                // Title
                 Text(board.title)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.black)
                     .lineLimit(1)
                 
-                HStack {
-                    Image(systemName: "square.stack.3d.up")
-                        .font(.system(size: 12))
-                        .foregroundColor(.gray)
-                    
-                    Text("\(board.elements.count) elements")
+                // Details
+                HStack(spacing: 4) {
+                    Text("\(board.elements.count) \(LocalizedStrings.elements)")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                     
-                    Spacer()
+                    Text("•")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
                     
-                    if let year = board.year {
-                        Text(year)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.appAccent)
-                    }
+                    Text(board.createdAt.daysAgo())
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
                 }
             }
-            .padding(12)
+            
+            Spacer()
+            
+            // Menu button (right side)
+            Button(action: {
+                showingDeleteAlert = true
+            }) {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.gray)
+                    .frame(width: 24, height: 24)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
+        .padding(16)
         .background(Color.white)
         .cornerRadius(16)
-        .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap()
+        }
+        .alert(LocalizedStrings.deleteBoard, isPresented: $showingDeleteAlert) {
+            Button(LocalizedStrings.cancel, role: .cancel) { }
+            Button(LocalizedStrings.delete, role: .destructive) {
+                onDelete()
+            }
+        } message: {
+            Text(String(format: LocalizedStrings.deleteBoardConfirm, board.title))
+        }
     }
 }
 

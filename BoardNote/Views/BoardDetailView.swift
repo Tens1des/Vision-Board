@@ -107,6 +107,14 @@ struct BoardDetailView: View {
                 VStack {
                     topToolbar
                     Spacer()
+                    
+                    // Floating Add Button (Top Right)
+                    floatingAddButton
+                }
+                
+                // Bottom Toolbar (Fixed at bottom)
+                VStack {
+                    Spacer()
                     bottomToolbar
                 }
             }
@@ -261,64 +269,147 @@ struct BoardDetailView: View {
                     .clipShape(Circle())
                     .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 60)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 60)
+                .padding(.bottom, 100)
     }
     
     // MARK: - Bottom Toolbar
     private var bottomToolbar: some View {
-        HStack(spacing: 20) {
-            Button(action: { showingAddElement = true }) {
-                VStack(spacing: 4) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
-                    Text("Add")
-                        .font(.system(size: 12))
+        HStack(spacing: 16) {
+            // Movement Button (Active)
+            Button(action: { 
+                // Movement mode is default - no special action needed
+            }) {
+                VStack(spacing: 6) {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        .font(.system(size: 20, weight: .medium))
+                    Text(LocalizedStrings.movement)
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundColor(.appPrimary)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.appPrimary)
+                .cornerRadius(12)
             }
             
-            Button(action: { addPhotoElement() }) {
-                VStack(spacing: 4) {
-                    Image(systemName: "photo")
-                        .font(.system(size: 24))
-                    Text("Photo")
-                        .font(.system(size: 12))
-                }
-                .foregroundColor(.appPrimary)
-                .frame(maxWidth: .infinity)
-            }
-            
+            // Text Button
             Button(action: { addTextElement() }) {
-                VStack(spacing: 4) {
-                    Image(systemName: "text.alignleft")
-                        .font(.system(size: 24))
-                    Text("Text")
-                        .font(.system(size: 12))
+                VStack(spacing: 6) {
+                    Text("T")
+                        .font(.system(size: 20, weight: .bold))
+                    Text(LocalizedStrings.text)
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundColor(.appPrimary)
+                .foregroundColor(.gray)
                 .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .cornerRadius(12)
             }
             
-            Button(action: { isDrawingArrow = true }) {
-                VStack(spacing: 4) {
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 24))
-                    Text("Arrow")
-                        .font(.system(size: 12))
+            // Photo Button
+            Button(action: { addPhotoElement() }) {
+                VStack(spacing: 6) {
+                    Image(systemName: "photo")
+                        .font(.system(size: 20, weight: .medium))
+                    Text(LocalizedStrings.photo)
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundColor(isDrawingArrow ? .appPrimary : .gray)
+                .foregroundColor(.gray)
                 .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .cornerRadius(12)
+            }
+            
+            // Shape Button
+            Button(action: { addShapeElement() }) {
+                VStack(spacing: 6) {
+                    Image(systemName: "square")
+                        .font(.system(size: 20, weight: .medium))
+                    Text(LocalizedStrings.figure)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundColor(.gray)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .cornerRadius(12)
+            }
+            
+            // Arrow Button
+            Button(action: { isDrawingArrow = true }) {
+                VStack(spacing: 6) {
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 20, weight: .medium))
+                    Text(LocalizedStrings.arrow)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundColor(.gray)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .cornerRadius(12)
             }
         }
-        .padding(.vertical, 12)
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -2)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 20)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 34)
+        .padding(.top, 12)
+        .background(
+            Color.white
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
+        )
+    }
+    
+    // MARK: - Floating Add Button
+    private var floatingAddButton: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button(action: { showingAddElement = true }) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 0.5, green: 0.35, blue: 0.94),
+                                        Color(red: 0.95, green: 0.39, blue: 0.69)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 56, height: 56)
+                        
+                        Image(systemName: "plus")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 150)
+            }
+        }
     }
     
     // MARK: - Helper Methods
@@ -366,6 +457,23 @@ struct BoardDetailView: View {
     // MARK: - Quick Actions
     private func addPhotoElement() {
         showingPhotoPicker = true
+    }
+    
+    private func addShapeElement() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
+        var newElement = BoardElement(
+            type: .shape,
+            position: CGPoint(x: screenWidth * 1.5, y: screenHeight * 1.5)
+        )
+        newElement.shapeType = .circle
+        newElement.color = "#4ECDC4"
+        
+        currentBoard.elements.append(newElement)
+        selectedElement = newElement
+        saveBoard()
+        dataManager.trackAction("add_shape")
     }
     
     private func addPhotoElement(data: Data) {

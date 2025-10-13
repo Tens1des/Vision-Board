@@ -302,5 +302,12 @@ struct LocalizedStrings {
     static var save: String { localizedString(for: "save") }
     static var close: String { localizedString(for: "close") }
     static var deleteBoard: String { localizedString(for: "deleteBoard") }
+    static var deleteBoardConfirm: String { localizedString(for: "deleteBoardConfirm") }
+    static var hello: String { localizedString(for: "hello") }
+    static var movement: String { localizedString(for: "movement") }
+    static var figure: String { localizedString(for: "figure") }
+    static var today: String { localizedString(for: "today") }
+    static var yesterday: String { localizedString(for: "yesterday") }
+    static var daysAgo: String { localizedString(for: "daysAgo") }
     static var lastUsed: String { localizedString(for: "lastUsed") }
 }

@@ -46,33 +46,6 @@ class BoardPreviewGenerator {
                 let emojiY = (size.height - emojiSize.height) / 2
                 (emoji as NSString).draw(at: CGPoint(x: emojiX, y: emojiY), withAttributes: attributes)
             }
-            
-            // Draw bottom overlay with title
-            context.cgContext.setFillColor(UIColor.black.withAlphaComponent(0.6).cgColor)
-            context.cgContext.fill(CGRect(x: 0, y: size.height - 80, width: size.width, height: 80))
-            
-            // Draw title
-            let titleFont = UIFont.systemFont(ofSize: 16, weight: .bold)
-            let titleAttributes: [NSAttributedString.Key: Any] = [
-                .font: titleFont,
-                .foregroundColor: UIColor.white
-            ]
-            let titleSize = (board.title as NSString).size(withAttributes: titleAttributes)
-            let titleX = (size.width - titleSize.width) / 2
-            let titleY = size.height - 60
-            (board.title as NSString).draw(at: CGPoint(x: titleX, y: titleY), withAttributes: titleAttributes)
-            
-            // Draw element count
-            let countText = "\(board.elements.count) elements"
-            let countFont = UIFont.systemFont(ofSize: 12)
-            let countAttributes: [NSAttributedString.Key: Any] = [
-                .font: countFont,
-                .foregroundColor: UIColor.white.withAlphaComponent(0.8)
-            ]
-            let countSize = (countText as NSString).size(withAttributes: countAttributes)
-            let countX = (size.width - countSize.width) / 2
-            let countY = size.height - 35
-            (countText as NSString).draw(at: CGPoint(x: countX, y: countY), withAttributes: countAttributes)
         }
         
         return image.jpegData(compressionQuality: 0.8)
