@@ -351,6 +351,7 @@ struct NewBoardSheet: View {
     @Binding var isPresented: Bool
     @State private var boardTitle = ""
     @State private var boardYear = ""
+    @State private var selectedDate = Date()
     @State private var selectedColor = "#7F5AF0"
     @State private var selectedEmoji = "🎯"
     @State private var selectedPhoto: PhotosPickerItem?
@@ -445,23 +446,26 @@ struct NewBoardSheet: View {
                             
                             // Year
                             VStack(alignment: .leading, spacing: 12) {
-                                HStack {
+                                HStack(spacing: 8) {
                                     Image(systemName: "calendar")
+                                        .font(.system(size: 16, weight: .medium))
                                         .foregroundColor(Color(hex: selectedColor))
                                         .frame(width: 20)
                                     
-                                    Text("Year (Optional)")
+                                    Text(LocalizedStrings.yearOptional)
                                         .font(.system(size: 16, weight: .semibold))
                                         .foregroundColor(.black)
+                                    
+                                    Spacer()
                                 }
                                 
-                                TextField("2025", text: $boardYear)
-                                    .font(.system(size: 18))
+                                DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                                    .datePickerStyle(CompactDatePickerStyle())
                                     .padding(16)
                                     .background(Color.white)
                                     .cornerRadius(16)
                                     .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-                                    .keyboardType(.numberPad)
+                                    .labelsHidden()
                             }
                             
                             // Board Icon Selection
@@ -649,7 +653,7 @@ struct NewBoardSheet: View {
     private func createBoard() {
         let newBoard = Board(
             title: boardTitle, 
-            year: boardYear.isEmpty ? nil : boardYear,
+            year: DateFormatter.yearFormatter.string(from: selectedDate),
             iconEmoji: selectedPhotoData == nil ? selectedEmoji : nil,
             iconPhotoData: selectedPhotoData
         )
@@ -658,3 +662,11 @@ struct NewBoardSheet: View {
     }
 }
 
+// MARK: - DateFormatter Extension
+extension DateFormatter {
+    static let yearFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
+        return formatter
+    }()
+}
