@@ -112,7 +112,21 @@ struct LocalizedStrings {
         // General
         "save": "Save",
         "close": "Close",
-        "deleteBoard": "Delete Board"
+        "deleteBoard": "Delete Board",
+        
+        // Tab Bar
+        "boards": "Boards",
+        "profile": "Profile",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "achievementsUnlocked": "Achievements Unlocked",
+        "visionBoardCreator": "Vision Board Creator",
+        "elementsCount": "Elements",
+        "appPreferences": "App preferences",
+        "about": "About",
+        "appInformation": "App information",
+        "support": "Support",
+        "getHelp": "Get help"
     ]
     
     // MARK: - Russian Strings
@@ -203,7 +217,21 @@ struct LocalizedStrings {
         // General
         "save": "Сохранить",
         "close": "Закрыть",
-        "deleteBoard": "Удалить доску"
+        "deleteBoard": "Удалить доску",
+        
+        // Tab Bar
+        "boards": "Доски",
+        "profile": "Профиль",
+        "unlocked": "Открыты",
+        "locked": "Закрыты",
+        "achievementsUnlocked": "Достижений открыто",
+        "visionBoardCreator": "Создатель досок мечт",
+        "elementsCount": "Элементы",
+        "appPreferences": "Настройки приложения",
+        "about": "О приложении",
+        "appInformation": "Информация о приложении",
+        "support": "Поддержка",
+        "getHelp": "Получить помощь"
     ]
     
     // MARK: - Convenience Properties

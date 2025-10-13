@@ -12,7 +12,6 @@ struct HomeView: View {
     @ObservedObject var dataManager = DataManager.shared
     @State private var searchText = ""
     @State private var showingNewBoardSheet = false
-    @State private var showingProfile = false
     
     var filteredBoards: [Board] {
         if searchText.isEmpty {
@@ -53,34 +52,15 @@ struct HomeView: View {
     
     // MARK: - Header View
     private var headerView: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("My Boards")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.black)
-                Text("Create and organize your vision")
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-            }
-            
-            Spacer()
-            
-            // User Avatar
-            Button(action: { showingProfile = true }) {
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: dataManager.user.avatarColor))
-                        .frame(width: 50, height: 50)
-                    
-                    Image(systemName: dataManager.user.avatarIcon)
-                        .foregroundColor(.white)
-                        .font(.system(size: 24))
-                }
-            }
-            .sheet(isPresented: $showingProfile) {
-                ProfileSheet(isPresented: $showingProfile)
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Text("My Boards")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(.black)
+            Text("Create and organize your vision")
+                .font(.system(size: 14))
+                .foregroundColor(.gray)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
         .padding(.top, 60)
         .padding(.bottom, 20)
