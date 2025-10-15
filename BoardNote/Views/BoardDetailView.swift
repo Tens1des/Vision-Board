@@ -22,7 +22,6 @@ struct BoardDetailView: View {
     @State private var lastCanvasScale: CGFloat = 1.0
     @State private var canvasOffset: CGSize = .zero
     @State private var lastCanvasOffset: CGSize = .zero
-    @State private var showingPresentation = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingQuickTextEditor = false
     @State private var showingPhotoPicker = false
@@ -145,9 +144,6 @@ struct BoardDetailView: View {
             QuickTextEditor(board: $currentBoard, isPresented: $showingQuickTextEditor)
         }
         .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedPhotoItem, matching: .images)
-        .fullScreenCover(isPresented: $showingPresentation) {
-            BoardPresentationView(board: currentBoard)
-        }
         .onChange(of: selectedPhotoItem) { newItem in
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self) {
@@ -230,15 +226,6 @@ struct BoardDetailView: View {
             Spacer()
             
             Menu {
-                Button(action: { 
-                    if !currentBoard.elements.isEmpty {
-                        showingPresentation = true 
-                    }
-                }) {
-                    Label("Present Board", systemImage: "play.rectangle")
-                }
-                .disabled(currentBoard.elements.isEmpty)
-                
                 Button(action: { dataManager.settings.showGrid.toggle() }) {
                     Label(dataManager.settings.showGrid ? "Hide Grid" : "Show Grid", systemImage: "grid")
                 }

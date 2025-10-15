@@ -15,6 +15,7 @@ struct BoardNoteApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(dataManager)
+                .preferredColorScheme(.light)
         }
     }
 }
